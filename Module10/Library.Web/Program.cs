@@ -22,7 +22,7 @@ public class Program
         services.AddMongoDb(builder.Configuration);
         services.AddIdentity(builder.Configuration);
         services.AddRabbitMq(builder.Configuration);
-        services.AddDomain();
+        services.AddDomain(builder.Configuration);
         services.AddRedis();
 
         services.AddMvc()

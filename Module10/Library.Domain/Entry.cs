@@ -1,27 +1,32 @@
 ﻿using System.Net;
 using System.Text;
+using Confluent.Kafka;
 using Library.Domain.Abstractions.Services;
 using Library.Domain.Services;
 using Library.SharedKernel.Enums;
 using Library.SharedKernel.Utils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.Extensions.Http;
 using Polly.Timeout;
+using Error = Library.SharedKernel.Utils.Error;
 
 namespace Library.Domain;
 
 public static class Entry
 {
-    public static IServiceCollection AddDomain(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddDomain(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         serviceCollection.AddScoped<IBookService, BookService>();
         serviceCollection.AddSingleton<IReviewService, ReviewService>();
         serviceCollection.AddScoped<IAuthorService, AuthorService>();
+        serviceCollection.AddScoped<IAnalyticsService, AnalyticsService>();
 
         serviceCollection.AddHttpClients();
+        serviceCollection.AddKafka(configuration);
 
         return serviceCollection;
     }
@@ -61,6 +66,20 @@ public static class Entry
         })
         .AddPolicyHandler(policyWrap);
 
+        return serviceCollection;
+    }
+
+    private static IServiceCollection AddKafka(this IServiceCollection serviceCollection, IConfiguration configuration)
+    {
+        serviceCollection.AddSingleton<IProducer<string, string>>(_ =>
+        {
+            var config = configuration
+                             .GetSection("Kafka")
+                             .Get<ProducerConfig>();
+    
+            return new ProducerBuilder<string, string>(config).Build();
+        });
+        
         return serviceCollection;
     }
 }
