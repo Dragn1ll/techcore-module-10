@@ -49,6 +49,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "essay", "essay", "{1E5CC8B4
 		RabbitMqVsKafka.md = RabbitMqVsKafka.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "kafka", "kafka", "{77A3F0D5-3AF0-49B3-A146-A02580AE3624}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalyticsWorker", "AnalyticsWorker\AnalyticsWorker.csproj", "{AF8C64C8-035C-4B6F-A86B-AEC552121F0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +111,10 @@ Global
 		{5BE4E8EF-E563-42DD-896B-BBD745D75D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BE4E8EF-E563-42DD-896B-BBD745D75D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BE4E8EF-E563-42DD-896B-BBD745D75D1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF8C64C8-035C-4B6F-A86B-AEC552121F0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF8C64C8-035C-4B6F-A86B-AEC552121F0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF8C64C8-035C-4B6F-A86B-AEC552121F0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF8C64C8-035C-4B6F-A86B-AEC552121F0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +134,7 @@ Global
 		{545BD6FF-A452-468F-9642-F4B1DCD4C1D9} = {550C663C-B8FD-4818-9BCB-A28979867CE4}
 		{329B11AA-DF40-4566-A228-2B0A0ED27238} = {550C663C-B8FD-4818-9BCB-A28979867CE4}
 		{5BE4E8EF-E563-42DD-896B-BBD745D75D1D} = {FE859603-C34F-4C4E-A5A1-44785D605CF3}
+		{AF8C64C8-035C-4B6F-A86B-AEC552121F0B} = {77A3F0D5-3AF0-49B3-A146-A02580AE3624}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {555040B5-2AF8-470E-B92C-B22C61E9A7BE}

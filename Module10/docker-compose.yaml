@@ -83,6 +83,14 @@
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_CREATE_TOPICS: "test-topic:1:1"
 
+  analyticsworker:
+    image: analyticsworker
+    build:
+      context: .
+      dockerfile: AnalyticsWorker/Dockerfile
+    depends_on:
+      - kafka
+
 volumes:
   postgres_data:
   redis_data:
