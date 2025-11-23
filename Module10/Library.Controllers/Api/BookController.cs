@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Library.Contracts.Books.Request;
 using Library.Contracts.Books.Response;
 using Library.Domain.Abstractions.Services;
@@ -15,11 +16,13 @@ public sealed class BookController : Controller
 {
     private readonly IBookService _bookService;
     private readonly IDistributedCache _cache;
+    private readonly IAnalyticsService _analyticsService;
 
-    public BookController(IBookService bookService, IDistributedCache cache)
+    public BookController(IBookService bookService, IDistributedCache cache, IAnalyticsService analyticsService)
     {
         _bookService = bookService;
         _cache = cache;
+        _analyticsService = analyticsService;
     }
     
     [HttpPost]
@@ -44,11 +47,14 @@ public sealed class BookController : Controller
     }
     
     [Authorize]
-    [HttpGet("{id:guid}")]
+    [HttpGet("{bookId:guid}")]
     [OutputCache(PolicyName = "BookPolicy")]
-    public async Task<ActionResult> GetBook([FromRoute] Guid id)
+    public async Task<ActionResult> GetBook([FromRoute] Guid bookId)
     {
-        var result = await _bookService.GetByIdAsync(id);
+        var result = await _bookService.GetByIdAsync(bookId);
+        
+        _analyticsService.PublishBookViewedAsync(bookId, User.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                                                         ?? "anonymous");
 
         return result.IsSuccess
             ? Ok(result.Value!.ToGetBookResponse())
