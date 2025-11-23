@@ -46,7 +46,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderWorkerService", "Order
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "essay", "essay", "{1E5CC8B4-06F7-4EB6-B0C5-E4136FA49B7C}"
 	ProjectSection(SolutionItems) = preProject
-		OrderSaga.md = OrderSaga.md
+		RabbitMqVsKafka.md = RabbitMqVsKafka.md
 	EndProjectSection
 EndProject
 Global
