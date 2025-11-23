@@ -1,0 +1,67 @@
+﻿services:
+  library.web:
+    image: library.web
+    build:
+      context: .
+      dockerfile: Library.Web/Dockerfile
+    ports:
+      - "5000:8080"
+    depends_on:
+      - postgres
+      - redis
+      - mongo
+      - rabbitmq
+  
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "library"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+  
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+  
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+  
+  orderworkerservice:
+    image: orderworkerservice
+    build:
+      context: .
+      dockerfile: OrderWorkerService/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+  rabbitmq_data:
