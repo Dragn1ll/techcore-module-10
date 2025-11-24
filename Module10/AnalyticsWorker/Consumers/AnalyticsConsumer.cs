@@ -10,6 +10,7 @@ public class AnalyticsConsumer : BackgroundService
     private readonly ILogger<AnalyticsConsumer> _logger;
     private readonly IConsumer<string, string> _consumer;
     private readonly IMongoCollection<BookViewDoc> _collection;
+    private const int MaxDegreeOfParallelism = 8;
 
     public AnalyticsConsumer(ILogger<AnalyticsConsumer> logger, IConfiguration configuration)
     {
@@ -34,6 +35,8 @@ public class AnalyticsConsumer : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _consumer.Subscribe("book_views");
+        
+        var runningTasks = new List<Task>();
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -41,17 +44,39 @@ public class AnalyticsConsumer : BackgroundService
             {
                 var result = _consumer.Consume(stoppingToken);
                 
-                _logger.LogInformation("Полученное сообщение: Ключ={Key}, Значение={Value}",
-                    result.Message.Key, result.Message.Value);
+                runningTasks.RemoveAll(t => t.IsCompleted);
                 
-                var doc = JsonSerializer.Deserialize<BookViewDoc>(result.Message.Value);
-
-                if (doc != null)
+                if (runningTasks.Count >= MaxDegreeOfParallelism)
                 {
-                    await _collection.InsertOneAsync(doc, cancellationToken: stoppingToken);
-                    
-                    _consumer.StoreOffset(result);
+                    var finished = await Task.WhenAny(runningTasks);
+                    runningTasks.Remove(finished);
                 }
+                
+                var task = Task.Run(async () =>
+                {
+                    try
+                    {
+                        _logger.LogInformation("Получено сообщение: Key={Key}, Value={Value}",
+                            result.Message.Key, result.Message.Value);
+
+                        var doc = JsonSerializer.Deserialize<BookViewDoc>(result.Message.Value);
+
+                        if (doc != null)
+                        {
+                            await _collection.InsertOneAsync(doc, cancellationToken: stoppingToken);
+
+                            _consumer.StoreOffset(result);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex,
+                            "Ошибка при асинхронной обработке сообщения из Kafka, partition={Partition}, " +
+                            "offset={Offset}", result.Partition, result.Offset);
+                    }
+                }, stoppingToken);
+
+                runningTasks.Add(task);
             }
             catch (OperationCanceledException)
             {
@@ -63,6 +88,8 @@ public class AnalyticsConsumer : BackgroundService
                 await Task.Delay(1000, stoppingToken);
             }
         }
+        
+        await Task.WhenAll(runningTasks);
     }
 
     public override void Dispose()
