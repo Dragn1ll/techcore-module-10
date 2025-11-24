@@ -15,15 +15,16 @@ public class AnalyticsConsumer : BackgroundService
     {
         _logger = logger;
 
-        var config = new ConsumerConfig
+        var consumerConfig = new ConsumerConfig
         {
-            BootstrapServers = configuration["Kafka:BootstrapServers"],
+            BootstrapServers = configuration["BootstrapServers"],
             GroupId = "analytics-worker",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = true
+            EnableAutoCommit = true,
+            EnableAutoOffsetStore = false
         };
 
-        _consumer = new ConsumerBuilder<string, string>(config).Build();
+        _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
         
         var mongoClient = new MongoClient("mongodb://mongo:27017");
         var database = mongoClient.GetDatabase("analytics");
@@ -48,6 +49,8 @@ public class AnalyticsConsumer : BackgroundService
                 if (doc != null)
                 {
                     await _collection.InsertOneAsync(doc, cancellationToken: stoppingToken);
+                    
+                    _consumer.StoreOffset(result);
                 }
             }
             catch (OperationCanceledException)
