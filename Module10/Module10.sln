@@ -47,6 +47,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "essay", "essay", "{1E5CC8B4-06F7-4EB6-B0C5-E4136FA49B7C}"
 	ProjectSection(SolutionItems) = preProject
 		RabbitMqVsKafka.md = RabbitMqVsKafka.md
+		KafkaStream.md = KafkaStream.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "kafka", "kafka", "{77A3F0D5-3AF0-49B3-A146-A02580AE3624}"
